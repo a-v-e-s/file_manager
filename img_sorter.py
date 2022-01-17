@@ -1,6 +1,5 @@
 import os
 import subprocess
-import hashlib
 from tempfile import TemporaryDirectory
 from shutil import copy2
 from PIL import Image
@@ -9,20 +8,6 @@ import psutil
 
 # jank to avoid deprecation warnings:
 from setuptools import distutils; from distutils.dir_util import copy_tree
-
-
-def get_sha1(fn, alg=hashlib.sha1):
-    """ Return hexdigest of a given file's hash """
-
-    hash_ = alg()
-    with open(fn, 'rb') as f:
-        while True:
-            data = f.read(65536)
-            if not data:
-                break
-            hash_.update(data)
-    
-    return hash_.hexdigest()
 
 
 def main():

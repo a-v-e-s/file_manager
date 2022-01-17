@@ -1,2 +1,3 @@
 managed.txt
 ignored.txt
+__pycache__/

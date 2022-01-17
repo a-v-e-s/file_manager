@@ -1,5 +1,5 @@
 """ 
-Sorting and managing files
+Utility functions
 Author: Jon David Tannehill
 """
 
@@ -9,14 +9,16 @@ import pickle
 import hashlib
 import subprocess
 import time
-#from PIL import Image
+
+import psutil
+from PIL import Image
 
 
 with open('managed.txt', 'r') as file:
     MANAGED = {line.strip() for line in file.readlines()}
 
 with open('ignored.txt', 'r') as file:
-    IGNORED = {line.strip() for lin in file.readlines()}
+    IGNORED = {line.strip() for line in file.readlines()}
 
 HOME = os.getenv('HOME')
 
@@ -37,24 +39,26 @@ def get_hash(filename, alg=hashlib.sha1):
 
 def display_img(fn):
     """ Display an image for the user. """
-
-    viewer = subprocess.Popen(['vlc', fn])
-    time.sleep(5)
-    viewer.terminate()
-    viewer.kill()
+    with Image.open(fn) as img:
+        img.show()
 
 
-def load_pickles():
+def close_display():
+    """ Close the display of the image. """
+    for ps in psutil.process_iter():
+        if ps.name() == 'display':
+            ps.kill()
+            break
+
+
+def load_pickle(folder):
     """ Load dictionaries from pickle files in managed folders """
 
-    dic = dict()
-
-    for folder in MANAGED:
-        filename = f'{HOME}/{folder}/file_db.pkl'
-        if os.path.isfile(filename):
-            dic[folder] = pickle.load(filename)
-        else:
-            pass
+    filename = f'{folder}/file_db.pkl'
+    if os.path.isfile(filename):
+        dic = pickle.load(filename)
+    else:
+        raise FileNotFoundError
 
     return dic
 
