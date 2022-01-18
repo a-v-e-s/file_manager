@@ -144,12 +144,14 @@ def get_hash(filename, alg=hashlib.sha1):
 
 def display_img(fn):
     """ Display an image for the user. """
+    
     with PIL.Image.open(fn) as img:
         img.show()
 
 
 def close_display():
     """ Close the display of the image. """
+
     for ps in psutil.process_iter():
         if ps.name() == 'display':
             ps.kill()
