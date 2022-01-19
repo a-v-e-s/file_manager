@@ -102,8 +102,8 @@ def sorting_coroutine(full_dirs, filter_dirs, filter_filetypes, notifier):
                         elif predestination not in pickles_changed:
                             pickles_changed.append(predestination)
 
-                # just stick it in there.
-                else: copy2(filepath, destination)
+                else: # just stick it in there.
+                    copy2(filepath, destination)
 
         # update our pickles:
         if pickles_changed:
