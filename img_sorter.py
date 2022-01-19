@@ -4,7 +4,6 @@ from tempfile import TemporaryDirectory
 from shutil import copy2
 from PIL import Image
 import psutil
-# build gui later: import tkinter as tk
 
 # jank to avoid deprecation warnings:
 from setuptools import distutils; from distutils.dir_util import copy_tree

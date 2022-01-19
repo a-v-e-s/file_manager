@@ -1,8 +1,16 @@
+#!/usr/bin/env python3
+
+"""
+file_sorter interface
+"""
+
+
 import tkinter as tk
 from tkinter.filedialog import askdirectory
 from functools import partial
 
 import utils
+from sorting_coroutine import sorting_coroutine
 
 
 class Gui():
@@ -12,6 +20,7 @@ class Gui():
         # state information:
         self.radio_row = 1
         self.radio_col = 1
+        self.radio_btns = dict()
         self.destinations = list()
         self.coroutine = None
         
@@ -109,7 +118,7 @@ class Gui():
         add_dest = tk.Button(
             master=create_dest,
             text='Add!',
-            command=self.add_radio_btn
+            command=self.add_radio_btn,
         )
         add_dest.grid(row=1, column=3)
         #
@@ -175,6 +184,9 @@ class Gui():
         lbl = tk.Label(master=self.radio_frm, text=lbl_text)
         lbl.grid(row=self.radio_row, column=self.radio_col+1)
         
+        self.radio_btns[lbl_text] = radio_btn
+        self.new_dest.delete(0, len(self.new_dest.get()))
+        
         # increment values for columns and rows:
         if self.radio_col > 3:
             self.radio_col = 1
@@ -185,7 +197,6 @@ class Gui():
 
     def message(self, msg):
         """ Tell the user something """
-
         self.msg.config(text=msg)
 
 
@@ -200,22 +211,27 @@ class Gui():
         print(f'filter_dirs: {filter_dirs}')
         print(f'filter_filetypes: {filter_filetypes}')
 
-        #self.coroutine = utils.sorting_coroutine(full_dirs, filter_dirs, filter_filetypes)
-        #self.coroutine.send(None)
+        self.coroutine = sorting_coroutine(full_dirs, filter_dirs, filter_filetypes, self.msg)
+        self.coroutine.send(None) # necessary before sending real data
 
 
     def send(self):
         """ Send a value to the coroutine """
 
-        print(f'sending: {self.dest.get()}')
-        #self.coroutine.send(self.dest.get())
+        dest = self.dest.get()
+        print(f'sending: {dest}')
+        try:
+            self.coroutine.send(dest)
+            self.radio_btns[dest].deselect()
+        except GeneratorExit as e:
+            self.message(e)
 
 
     def skip(self):
         """ Tell the coroutine to skip the current file """
 
         print('Sending None!')
-        #self.coroutine.send(None)
+        self.coroutine.send(None)
 
 
 if __name__ == '__main__':
